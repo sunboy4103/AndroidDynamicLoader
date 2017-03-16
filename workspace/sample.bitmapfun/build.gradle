@@ -38,5 +38,5 @@ android {
 dependencies {
     compile "com.android.support:support-v4:$ANDROID_SUPPORT_VERSION"
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':workspace:lib.bitmapfun')
+//    compile project(':workspace:lib.bitmapfun')
 }

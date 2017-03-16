@@ -1,0 +1,11 @@
+include ':Host'
+//, ':legacy:ActivityDeveloper'
+include ':workspace:lib.bitmapfun'
+include ':workspace:sample.bitmapfun'
+include ':workspace:sample.helloworld'
+
+include ':legacy:ActivityDeveloper'
+include ':legacy:ActivityLoader'
+include ':legacy:FragmentDeveloper'
+include ':legacy:FragmentLoader'
+
