@@ -25,6 +25,13 @@ import android.util.Log;
 
 import com.dianping.loader.model.FileSpec;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+
 public class RepositoryManager {
 	/**
 	 * 已经下载并校验完毕，可以直接加载
@@ -277,6 +284,25 @@ public class RepositoryManager {
 					URL url = new URL(current.url());
 					HttpURLConnection conn = (HttpURLConnection) url
 							.openConnection();
+                    if (current.url().startsWith("https")) {
+                        // 创建SSLContext对象，并使用我们指定的信任管理器初始化
+                        TrustManager[] tm = {new MyX509TrustManager()};
+                        SSLContext sslContext = SSLContext.getInstance("TLS");
+                        sslContext.init(null, tm, new java.security.SecureRandom());
+
+                        // 从上述SSLContext对象中得到SSLSocketFactory对象
+                        SSLSocketFactory ssf = sslContext.getSocketFactory();
+                        conn = (HttpsURLConnection) conn;
+                        ((HttpsURLConnection) conn).setSSLSocketFactory(ssf);
+                        ((HttpsURLConnection) conn).setHostnameVerifier(new HostnameVerifier() {
+                            @Override
+                            public boolean verify(String arg0, SSLSession arg1) {
+                                return true;
+                            }
+                        });
+                    }
+
+
 					conn.setConnectTimeout(15000);
 					// conn.setRequestProperty("User-Agent",
 					// Environment.mapiUserAgent());

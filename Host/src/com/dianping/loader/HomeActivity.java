@@ -22,6 +22,13 @@ import com.dianping.app.MyActivity;
 import com.dianping.app.MyApplication;
 import com.dianping.loader.model.SiteSpec;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+
 public class HomeActivity extends MyActivity {
 	TextView siteUrl;
 
@@ -99,6 +106,25 @@ public class HomeActivity extends MyActivity {
 				URL url = new URL(siteUrl);
 				HttpURLConnection conn = (HttpURLConnection) url
 						.openConnection();
+                if (siteUrl.startsWith("https")) {
+                    // 创建SSLContext对象，并使用我们指定的信任管理器初始化
+                    TrustManager[] tm = {new MyX509TrustManager()};
+                    SSLContext sslContext = SSLContext.getInstance("TLS");
+                    sslContext.init(null, tm, new java.security.SecureRandom());
+
+                    // 从上述SSLContext对象中得到SSLSocketFactory对象
+                    SSLSocketFactory ssf = sslContext.getSocketFactory();
+                    conn = (HttpsURLConnection) conn;
+                    ((HttpsURLConnection) conn).setSSLSocketFactory(ssf);
+                    ((HttpsURLConnection) conn).setHostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String arg0, SSLSession arg1) {
+                            return true;
+                        }
+                    });
+                }
+
+
 				conn.setConnectTimeout(15000);
 				InputStream ins = conn.getInputStream();
 				ByteArrayOutputStream bos = new ByteArrayOutputStream(16 * 1024);
